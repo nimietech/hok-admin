@@ -1,36 +1,38 @@
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Eye, MoreHorizontal } from "lucide-react";
 
 const orders = [
   {
     id: "#ORD-001",
     customer: "John Doe",
-    product: "Wireless Headphones",
-    amount: "$89.99",
+    product: "Hoodies Up And Down",
+    amount: "$50.00",
     status: "completed",
     date: "2 hours ago"
   },
   {
     id: "#ORD-002",
     customer: "Sarah Smith",
-    product: "Smart Watch",
-    amount: "$299.99",
+    product: "Black Signature Pant",
+    amount: "$30.00",
     status: "processing",
     date: "4 hours ago"
   },
   {
     id: "#ORD-003",
     customer: "Mike Johnson",
-    product: "Laptop Stand",
-    amount: "$45.50",
+    product: "Signature Hofkam Cap",
+    amount: "$10.99",
     status: "shipped",
     date: "6 hours ago"
   },
   {
     id: "#ORD-004",
     customer: "Emily Brown",
-    product: "Phone Case",
-    amount: "$19.99",
+    product: "Black On Black Signature",
+    amount: "$50.00",
     status: "pending",
     date: "8 hours ago"
   }
@@ -51,7 +53,7 @@ export const RecentOrders = () => {
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-        <a href="#" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+        <a href="/orders" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
           View all
         </a>
       </div>
@@ -69,15 +71,25 @@ export const RecentOrders = () => {
               <p className="text-sm text-gray-600 mt-1">{order.product}</p>
             </div>
             
-            <div className="text-right">
-              <p className="font-semibold text-gray-900">{order.amount}</p>
-              <Badge className={`mt-1 ${getStatusColor(order.status)}`}>
-                {order.status}
-              </Badge>
-            </div>
-            
-            <div className="text-right ml-4">
-              <p className="text-sm text-gray-500">{order.date}</p>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="font-semibold text-gray-900">{order.amount}</p>
+                <Badge className={`mt-1 ${getStatusColor(order.status)}`}>
+                  {order.status}
+                </Badge>
+              </div>
+              
+              <div className="text-right">
+                <p className="text-sm text-gray-500">{order.date}</p>
+                <div className="flex space-x-1 mt-1">
+                  <Button variant="ghost" size="sm">
+                    <Eye size={14} />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <MoreHorizontal size={14} />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         ))}

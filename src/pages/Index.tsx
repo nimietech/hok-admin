@@ -3,13 +3,16 @@ import { AdminSidebar } from "@/components/AdminSidebar";
 import { StatsCard } from "@/components/StatsCard";
 import { RecentOrders } from "@/components/RecentOrders";
 import { TopProducts } from "@/components/TopProducts";
+import { SalesChart } from "@/components/SalesChart";
 import { 
   ShoppingCart, 
   Users, 
   FileText, 
   Calendar,
   Search,
-  Bell
+  Bell,
+  TrendingUp,
+  ArrowUpRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,33 +96,80 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Additional Analytics Section */}
+          {/* Analytics Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Sales Overview</h3>
-              <div className="h-64 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center">
-                <p className="text-gray-600">Chart Placeholder - Sales Data</p>
-              </div>
-            </div>
+            <SalesChart />
             
             <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer Activity</h3>
-              <div className="space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Quick Stats</h3>
+                <Button variant="ghost" size="sm">
+                  <ArrowUpRight size={16} />
+                </Button>
+              </div>
+              <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">New Registrations</span>
-                  <span className="font-semibold">+24</span>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <TrendingUp size={20} className="text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Conversion Rate</p>
+                      <p className="text-sm text-gray-600">From visits to sales</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">3.4%</p>
+                    <p className="text-sm text-green-600">+0.3%</p>
+                  </div>
                 </div>
+                
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Active Sessions</span>
-                  <span className="font-semibold">156</span>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Users size={20} className="text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">New Customers</p>
+                      <p className="text-sm text-gray-600">This week</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">127</p>
+                    <p className="text-sm text-green-600">+23</p>
+                  </div>
                 </div>
+                
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Bounce Rate</span>
-                  <span className="font-semibold">23.4%</span>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <ShoppingCart size={20} className="text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Average Order</p>
+                      <p className="text-sm text-gray-600">Per customer</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">$67.50</p>
+                    <p className="text-sm text-green-600">+$4.20</p>
+                  </div>
                 </div>
+                
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Avg. Session Duration</span>
-                  <span className="font-semibold">4m 32s</span>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <FileText size={20} className="text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Pending Orders</p>
+                      <p className="text-sm text-gray-600">Awaiting processing</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">8</p>
+                    <p className="text-sm text-red-600">+3</p>
+                  </div>
                 </div>
               </div>
             </div>
