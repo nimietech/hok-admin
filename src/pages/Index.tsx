@@ -1,74 +1,88 @@
-
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { StatsCard } from "@/components/StatsCard";
 import { RecentOrders } from "@/components/RecentOrders";
 import { TopProducts } from "@/components/TopProducts";
 import { SalesChart } from "@/components/SalesChart";
-import { 
-  ShoppingCart, 
-  Users, 
-  FileText, 
+import {
+  ShoppingCart,
+  Users,
+  FileText,
   Calendar,
   Search,
   Bell,
   TrendingUp,
   ArrowUpRight,
-  Menu
+  Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useFetcher } from "@/hooks/api/fetcher";
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const { isLoading, data } = useFetcher(
+    "/product/fetch-products?page=1&limit=20"
+  );
+  console.log(data);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      
+
       <div className="flex w-full">
         {/* Sidebar - Hidden on mobile, shown on desktop */}
         <div className="hidden lg:block">
           <AdminSidebar />
         </div>
-        
+
         {/* Mobile sidebar */}
-        <div className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:hidden`}>
+        <div
+          className={`fixed inset-y-0 left-0 z-50 transform ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300 ease-in-out lg:hidden`}
+        >
           <AdminSidebar />
         </div>
-        
+
         <div className="flex-1 w-full overflow-hidden">
           {/* Header */}
           <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 {/* Mobile menu button */}
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   className="lg:hidden"
                   onClick={() => setSidebarOpen(true)}
                 >
                   <Menu size={20} />
                 </Button>
-                
+
                 <div>
-                  <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
-                  <p className="text-sm lg:text-base text-gray-600 hidden sm:block">Welcome back! Here's what's happening with your store.</p>
+                  <h1 className="text-xl lg:text-2xl font-bold text-gray-900">
+                    Dashboard
+                  </h1>
+                  <p className="text-sm lg:text-base text-gray-600 hidden sm:block">
+                    Welcome back! Here's what's happening with your store.
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2 lg:space-x-4">
                 <div className="relative hidden sm:block">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                  <Input 
-                    placeholder="Search..." 
+                  <Search
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={16}
+                  />
+                  <Input
+                    placeholder="Search..."
                     className="pl-10 w-48 lg:w-64"
                   />
                 </div>
@@ -132,10 +146,12 @@ const Index = () => {
             {/* Analytics Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
               <SalesChart />
-              
+
               <div className="bg-white rounded-xl border border-gray-200 p-4 lg:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Quick Stats</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Quick Stats
+                  </h3>
                   <Button variant="ghost" size="sm">
                     <ArrowUpRight size={16} />
                   </Button>
@@ -144,11 +160,18 @@ const Index = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 lg:w-10 lg:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <TrendingUp size={16} className="lg:w-5 lg:h-5 text-blue-600" />
+                        <TrendingUp
+                          size={16}
+                          className="lg:w-5 lg:h-5 text-blue-600"
+                        />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 text-sm lg:text-base">Conversion Rate</p>
-                        <p className="text-xs lg:text-sm text-gray-600">From visits to sales</p>
+                        <p className="font-medium text-gray-900 text-sm lg:text-base">
+                          Conversion Rate
+                        </p>
+                        <p className="text-xs lg:text-sm text-gray-600">
+                          From visits to sales
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -156,15 +179,22 @@ const Index = () => {
                       <p className="text-sm text-green-600">+0.3%</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 lg:w-10 lg:h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Users size={16} className="lg:w-5 lg:h-5 text-green-600" />
+                        <Users
+                          size={16}
+                          className="lg:w-5 lg:h-5 text-green-600"
+                        />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 text-sm lg:text-base">New Customers</p>
-                        <p className="text-xs lg:text-sm text-gray-600">This week</p>
+                        <p className="font-medium text-gray-900 text-sm lg:text-base">
+                          New Customers
+                        </p>
+                        <p className="text-xs lg:text-sm text-gray-600">
+                          This week
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -172,15 +202,22 @@ const Index = () => {
                       <p className="text-sm text-green-600">+23</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 lg:w-10 lg:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <ShoppingCart size={16} className="lg:w-5 lg:h-5 text-purple-600" />
+                        <ShoppingCart
+                          size={16}
+                          className="lg:w-5 lg:h-5 text-purple-600"
+                        />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 text-sm lg:text-base">Average Order</p>
-                        <p className="text-xs lg:text-sm text-gray-600">Per customer</p>
+                        <p className="font-medium text-gray-900 text-sm lg:text-base">
+                          Average Order
+                        </p>
+                        <p className="text-xs lg:text-sm text-gray-600">
+                          Per customer
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -188,15 +225,22 @@ const Index = () => {
                       <p className="text-sm text-green-600">+$4.20</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 lg:w-10 lg:h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <FileText size={16} className="lg:w-5 lg:h-5 text-orange-600" />
+                        <FileText
+                          size={16}
+                          className="lg:w-5 lg:h-5 text-orange-600"
+                        />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 text-sm lg:text-base">Pending Orders</p>
-                        <p className="text-xs lg:text-sm text-gray-600">Awaiting processing</p>
+                        <p className="font-medium text-gray-900 text-sm lg:text-base">
+                          Pending Orders
+                        </p>
+                        <p className="text-xs lg:text-sm text-gray-600">
+                          Awaiting processing
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
