@@ -5,18 +5,22 @@ import {
   LayoutDashboard, 
   ShoppingCart, 
   Users, 
+  Tags,
   Settings, 
   FileText,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Landmark
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/Dashboard" },
   { icon: ShoppingCart, label: "Products", path: "/products" },
+  { icon: Tags, label: "Categories", path: "/categories" },
   { icon: FileText, label: "Orders", path: "/orders" },
   { icon: Users, label: "Customers", path: "/customers" },
+  { icon: Landmark, label: "Transactions", path: "/transactions" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 

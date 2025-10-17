@@ -1,9 +1,10 @@
 
+import { useEffect, useState } from "react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Table,
   TableBody,
   TableCell,
@@ -11,148 +12,282 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, UserPlus, Mail, Phone } from "lucide-react";
+import { Menu, Search, Eye } from "lucide-react"; // 👁️ added Eye icon
+import { toast } from "react-hot-toast";
+import { useAxios } from "@/hooks/api/axios";
+import { format } from "date-fns";
+    
 
-const customers = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1 (555) 123-4567",
-    orders: 12,
-    totalSpent: "$450.00",
-    status: "Active",
-    joinDate: "2024-01-15"
-  },
-  {
-    id: 2,
-    name: "Sarah Smith",
-    email: "sarah@example.com",
-    phone: "+1 (555) 987-6543",
-    orders: 8,
-    totalSpent: "$320.00",
-    status: "Active",
-    joinDate: "2024-02-20"
-  },
-  {
-    id: 3,
-    name: "Mike Johnson",
-    email: "mike@example.com",
-    phone: "+1 (555) 456-7890",
-    orders: 5,
-    totalSpent: "$180.00",
-    status: "Inactive",
-    joinDate: "2024-03-10"
-  },
-  {
-    id: 4,
-    name: "Emily Brown",
-    email: "emily@example.com",
-    phone: "+1 (555) 654-3210",
-    orders: 15,
-    totalSpent: "$680.00",
-    status: "VIP",
-    joinDate: "2023-12-05"
-  }
-];
+interface Customer {
+  _id: string;
+  username: string;
+  email: string;
+  gender: string;
+  dateOfBirth: string;
+  phoneNumber: string;
+  verified: boolean;
+  location: string;
+  role: string;
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'VIP': return 'bg-purple-100 text-purple-800';
-    case 'Active': return 'bg-green-100 text-green-800';
-    case 'Inactive': return 'bg-gray-100 text-gray-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-};
+}
 
-const Customers = () => {
-  return (
-    <div className="min-h-screen bg-gray-50 flex w-full">
-      <AdminSidebar />
+export default function Customers() {
+  const { axios, loading } = useAxios();
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  // ✅ pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  /** Fetch paginated customers list */
+  const fetchCustomers = async (p: number = page) => {
+    try {
+      const { data } = await axios.get(
+        `/user/fetch-users?page=${p}&limit=25`
+      );
+      console.log(data)
+      console.log(data?.data?.data.results)
+      // adjust to actual API shape if nested
+      setCustomers(data?.data?.data.results || []);
+      setTotalPages(data?.data?.data.pages || 1);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch customers");
+    }
+  };
+
+  /** Fetch single customer by email | _id | username  */
+  const fetchCustomerDetail = async (params: {
+    email?: string;
+    _id?: string;
+    username?: string;
+  }) => {
+    try {
+      setDetailLoading(true);
+      const { data } = await axios.get("/user/fetch-user", { params });
       
-      <div className="flex-1 overflow-hidden">
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
-              <p className="text-gray-600">Manage your customer relationships</p>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                <Input 
-                  placeholder="Search customers..." 
-                  className="pl-10 w-64"
-                />
-              </div>
-              <Button>
-                <UserPlus size={16} className="mr-2" />
-                Add Customer
+      console.log(data)
+      setSelectedCustomer(data?.data || data?.user);
+    } catch (error) {
+      console.error(error);
+      toast.error("Could not fetch customer details");
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers(page);
+  }, [page]);
+
+  /** Filter for client-side search (username or email) */
+  const filtered = Array.isArray(customers) ? customers.filter((c) =>
+      `${c.username} ${c.email}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    ) : [];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <div className="flex w-full">
+        {/* Desktop sidebar */}
+        <div className="hidden lg:block">
+          <AdminSidebar />
+        </div>
+
+        {/* Mobile sidebar */}
+        <div
+          className={`fixed inset-y-0 left-0 z-50 transform ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300 ease-in-out lg:hidden`}
+        >
+          <AdminSidebar />
+        </div>
+
+        {/* Main content */}
+        <div className="flex-1 overflow-hidden">
+          {/* Top bar */}
+          <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4 flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu size={20} />
+            </Button>
+
+            <h1 className="text-xl lg:text-2xl font-bold text-gray-900">
+              Customers
+            </h1>
+          </header>
+
+          <main className="p-4 lg:p-6">
+            {/* Search bar */}
+            <div className="flex items-center mb-4 gap-2">
+              <Input
+                placeholder="Search by username or email"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-sm"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => fetchCustomers()}
+                disabled={loading}
+              >
+                <Search size={18} />
               </Button>
             </div>
-          </div>
-        </header>
 
-        <main className="p-6">
-          <div className="bg-white rounded-xl border border-gray-200">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Orders</TableHead>
-                  <TableHead>Total Spent</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Join Date</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {customers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                          {customer.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <span className="font-medium">{customer.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="text-sm flex items-center">
-                          <Mail size={14} className="mr-1" />
-                          {customer.email}
-                        </p>
-                        <p className="text-sm text-gray-600 flex items-center">
-                          <Phone size={14} className="mr-1" />
-                          {customer.phone}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>{customer.orders}</TableCell>
-                    <TableCell className="font-semibold">{customer.totalSpent}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(customer.status)}>
-                        {customer.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{customer.joinDate}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm">
-                        View Details
-                      </Button>
-                    </TableCell>
+            {/* Table */}
+            <div className="overflow-x-auto bg-white shadow rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer Name</TableHead>
+                    <TableHead>Customer Email</TableHead>
+                    <TableHead>Gender</TableHead>
+                    <TableHead>Date Of Birth</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </main>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((c) => (
+                    <TableRow key={c._id}>
+                      <TableCell className="font-medium">{c.username}</TableCell>
+                      <TableCell>{c.email}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{c.gender}</Badge>
+                      </TableCell>
+                      <TableCell>
+                      {format(new Date(c.dateOfBirth), "MMM dd, yyyy")}
+                      </TableCell>
+                      <TableCell>
+                         {/* 👁️ changed to Eye icon button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => fetchCustomerDetail({ _id: c._id })}
+                        >
+                          <Eye size={16} />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {loading && (
+                <p className="p-4 text-center text-gray-500">Loading...</p>
+              )}
+              {!loading && filtered.length === 0 && (
+                <p className="p-4 text-center text-gray-500">
+                  No customers found
+                </p>
+              )}
+            </div>
+
+             {/* ✅ Pagination Controls */}
+            <div className="flex justify-between items-center mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              >
+                Prev
+              </Button>
+              <span className="text-sm text-gray-600">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+              >
+                Next
+              </Button>
+            </div>
+
+            {/* Detail Drawer / Modal */}
+            {selectedCustomer && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl relative">
+                  <button
+                    onClick={() => setSelectedCustomer(null)}
+                    className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                  >
+                    ✕
+                  </button>
+
+                  <h2 className="text-lg font-bold mb-4">
+                    Customer Details
+                  </h2>
+
+                  {detailLoading ? (
+                    <p className="text-center text-gray-500">Loading...</p>
+                  ) : (
+                    <div className="space-y-2">
+                      <p>
+                        <span className="font-semibold">Username:</span>{" "}
+                        {selectedCustomer.username}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Email:</span>{" "}
+                        {selectedCustomer.email}
+                      </p>
+
+                      <p>
+                        <span className="font-semibold">Gender:</span>{" "}
+                        {selectedCustomer.gender}
+                      </p>
+                      
+                      <p>
+                        <span className="font-semibold">Verified:</span>
+                        <Badge className={selectedCustomer.verified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
+                            {selectedCustomer.verified ? "Verified" : "Not Verified"}
+                        </Badge>
+                      </p>
+                      <p>
+                        <span className="font-semibold">Location:</span>{" "}
+                        {selectedCustomer.location}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Contact info:</span>{" "}
+                        {selectedCustomer.phoneNumber}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Role:</span>{" "}
+                        {selectedCustomer.role}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Date Of Birth:</span>{" "}
+                        {format(new Date(selectedCustomer.dateOfBirth), "MMM dd, yyyy")}
+                      </p>
+                      
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Customers;
+}

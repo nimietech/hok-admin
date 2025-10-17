@@ -1,5 +1,6 @@
-export interface ApiResponse {
-  data?: Record<string, any>;
+export interface ApiResponse<T = any>{
+  data?: T;
   responseCode: string;
   responseMessage: string;
 }
+

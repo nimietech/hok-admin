@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useEffect } from "react";
 import { AxiosError } from "axios";
@@ -16,6 +16,7 @@ export const useFetcher = (
 
   const fetcher = async (url: string) => {
     const res = await axios.get<ApiResponse>(url, { params });
+    console.log("➡️ Request Headers:", res.config?.headers);
     return res.data;
   };
 
