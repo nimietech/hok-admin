@@ -16,10 +16,10 @@ import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/Dashboard" },
-  { icon: ShoppingCart, label: "Products", path: "/products" },
-  { icon: Tags, label: "Categories", path: "/categories" },
   { icon: FileText, label: "Orders", path: "/orders" },
   { icon: Users, label: "Customers", path: "/customers" },
+  { icon: ShoppingCart, label: "Products", path: "/products" },
+  { icon: Tags, label: "Categories", path: "/categories" },
   { icon: Landmark, label: "Transactions", path: "/transactions" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
@@ -33,8 +33,7 @@ export const AdminSidebar = () => {
       <div className="p-4 lg:p-6 border-b border-gray-200 flex items-center justify-between">
         {!collapsed && (
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
-            <h1 className="text-lg lg:text-xl font-bold text-gray-900">Hok Store</h1>
+            <h1 className="text-lg lg:text-xl font-bold text-gray-900">HOK Store</h1>
           </div>
         )}
         <Button 

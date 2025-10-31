@@ -226,9 +226,12 @@ const Index = () => {
                   <span className="hidden lg:inline">Notifications</span>
                 </Button>
 
-                <Button className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full">
+                {/* <Button className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full">
                     <a href=""><UserRoundCheck/></a>
-                </Button>
+                </Button> */}
+                <div className="w-28"> 
+                  <img className= "w-[120%] h-[100%]" src="assets/logo1.png" alt="" />
+                </div>
               </div>
             </div>
           </header>

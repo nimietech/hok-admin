@@ -228,8 +228,8 @@ const Transactions = () => {
                           <TableCell>
                             <span
                               className={`px-2 py-1 text-xs rounded-full ${
-                                txn.status === "success"
-                                  ? "bg-green-100 text-green-800"
+                                txn.status === "SUCCESS"
+                                  ? "bg-green-100 text-green-500"
                                   : "bg-red-100 text-red-800"
                               }`}
                             >
