@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useAxios } from "@/hooks/api/axios";
+// import { useAxios } from "@/hooks/api/axios";
+import axios from "@/hooks/api/axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react"; 
 
 export default function LoginPage() {
-  const { axios, loading: axiosLoading } = useAxios();
+  const [loading, setLoading] = useState(false);
+
+  // const { axios, loading: axiosLoading } = useAxios();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -19,6 +22,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       const { data } = await axios.post("/auth/login", {
@@ -29,6 +33,10 @@ export default function LoginPage() {
       console.log("🔑 Full login response:", data);
 
       const token = data.data?.token;
+
+      console.log("LOCAL:", localStorage.getItem("token"));
+      console.log("SESSION:", sessionStorage.getItem("token"));
+
 
       if (token && data.success) {
         // ✅ store token securely
@@ -43,7 +51,10 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError("Network error. Try again.");
-    }
+      
+    } finally {
+    setLoading(false);
+  }
   };
 
   return (
@@ -110,12 +121,23 @@ export default function LoginPage() {
             )}
 
             {/* Login Button */}
-            <Button
+            {/* <Button
               type="submit"
               disabled={axiosLoading}
               className="w-full h-11 text-white font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition flex items-center justify-center"
             >
               {axiosLoading ? (
+                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                "Login"
+              )}
+            </Button> */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 ..."
+            >
+              {loading ? (
                 <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 "Login"

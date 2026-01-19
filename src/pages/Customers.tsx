@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/table";
 import { Menu, Search, Eye } from "lucide-react"; // 👁️ added Eye icon
 import { toast } from "react-hot-toast";
-import { useAxios } from "@/hooks/api/axios";
+import axios from "@/hooks/api/axios";
+
+// import { useAxios } from "@/hooks/api/axios";
 import { format } from "date-fns";
     
 
@@ -32,13 +34,15 @@ interface Customer {
 }
 
 export default function Customers() {
-  const { axios, loading } = useAxios();
+  // const { axios} = useAxios();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // local loading
+  const [error, setError] = useState("");
 
   // ✅ pagination state
   const [page, setPage] = useState(1);
@@ -55,10 +59,14 @@ export default function Customers() {
       // adjust to actual API shape if nested
       setCustomers(data?.data?.data.results || []);
       setTotalPages(data?.data?.data.pages || 1);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      setError("Network error. Please try again.");
+      console.error("Error fetching customers:", err);
       toast.error("Failed to fetch customers");
+    } finally {
+      setLoading(false);
     }
+      
   };
 
   /** Fetch single customer by email | _id | username  */
@@ -155,6 +163,11 @@ export default function Customers() {
             </div>
 
             {/* Table */}
+            {error && (
+              <div className="bg-red-100 text-red-800 p-3 rounded-md mb-4">
+                {error}
+              </div>
+            )}
             <div className="overflow-x-auto bg-white shadow rounded-lg">
               <Table>
                 <TableHeader>

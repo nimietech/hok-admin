@@ -20,7 +20,9 @@ import {
 import { Search, Menu, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
-import { useAxios } from "@/hooks/api/axios";
+import axios from "@/hooks/api/axios";
+
+// import { useAxios } from "@/hooks/api/axios";
 
 // Interfaces
 interface Transaction {
@@ -39,7 +41,7 @@ interface Transaction {
 }
 
 const Transactions = () => {
-  const { axios } = useAxios();
+  // const { axios } = useAxios();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [search, setSearch] = useState("");

@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/pagination";
 import { Search, Plus, Edit, Trash2, Menu, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useAxios } from "@/hooks/api/axios";
-import axios from "axios";
+import axios from "@/hooks/api/axios";
+
+// import { useAxios } from "@/hooks/api/axios";
+
 
 interface Category {
   _id: string;
@@ -26,7 +28,7 @@ interface Category {
 }
 
 const Categories = () => {
-  const { axios } = useAxios();
+  // const { axios } = useAxios();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);

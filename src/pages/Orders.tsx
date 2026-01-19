@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/table";
 import { Search, Eye, X, Menu } from "lucide-react";
 import { format } from "date-fns";
-import { useAxios } from "@/hooks/api/axios";
+import axios from "@/hooks/api/axios";
+
+// import { useAxios } from "@/hooks/api/axios";
 
 /* ---------- Types ---------- */
 interface Product {
@@ -63,7 +65,7 @@ const statusOptions = ["PENDING", "PROCESSING", "IN_TRANSIT", "PAID", "DELIVERED
 
 /* ---------- Component ---------- */
 const Orders = () => {
-  const { axios } = useAxios();
+  // const { axios } = useAxios();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
@@ -71,6 +73,7 @@ const Orders = () => {
   const [newStatus, setNewStatus] = useState("");
   const [newPickUpLocation, setNewPickUpLocation] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState("");
 
   // ✅ Pagination state
   const [page, setPage] = useState(1);
@@ -85,7 +88,7 @@ const Orders = () => {
       const { data } = await axios.get(
         `/orders/admin-fetch-orders?page=${pageNumber}&limit=25`
       );
-
+      
       console.log("Fetched orders:", data)
 
       // Adjust to API shape
@@ -94,6 +97,7 @@ const Orders = () => {
       setTotalPages(data?.data?.pages || 1);
     } catch (err) {
       console.error("Error fetching orders:", err);
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -214,6 +218,11 @@ const Orders = () => {
 
           {/* Orders Table */}
           <main className="p-4 lg:p-6">
+            {error && (
+              <div className="bg-red-100 text-red-800 p-3 rounded-md mb-4">
+                {error}
+              </div>
+            )}
             <div className="bg-white rounded-xl border border-gray-200">
               {loading ? (
                 <p className="p-6 text-center">Loading orders...</p>

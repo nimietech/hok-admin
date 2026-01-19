@@ -1,148 +1,73 @@
-
-import { useState, useMemo } from "react";
-import { toast } from "react-hot-toast";
 import Axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import { toast } from "react-hot-toast";
 import { ApiResponse } from "./type";
 
-export const baseURL = import.meta.env.VITE_BASE_URL || "";
+const baseURL =
+  import.meta.env.VITE_BASE_URL ||
+  "https://hok-backend-6gpg.onrender.com/api/v1";
 
-export const useAxios = () => {
-  const [loading, setLoading] = useState<boolean>(false);
+console.log("BASE URL:", baseURL);
 
-  const axios = useMemo<AxiosInstance>(() => {
-    const axiosInstance = Axios.create({
-      baseURL,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-    });
+/**
+ * ✅ SINGLE GLOBAL AXIOS INSTANCE
+ */
+const axios: AxiosInstance = Axios.create({
+  baseURL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-    axiosInstance.interceptors.request.use(
-      async (config) => {
-        setLoading(true);
-        const token = localStorage.getItem("token");
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        setLoading(false);
-        return Promise.reject(error);
-      }
-    );
+/**
+ * ✅ REQUEST INTERCEPTOR
+ */
+axios.interceptors.request.use(
+  (config) => {
+    const token =
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("token");
 
-    axiosInstance.interceptors.response.use(
-      (response: AxiosResponse<ApiResponse>): AxiosResponse<ApiResponse> => {
-        setLoading(false);
-        return response;
-      },
-      async (error: AxiosError<ApiResponse>) => {
-        setLoading(false);
+    console.log("🧠 Axios token:", token);
 
-        if (!error.response) {
-          toast.error("Connection error");
-          throw error;
-        }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log("✅ AUTH HEADER SET:", config.headers.Authorization);
+    } else {
+      console.warn("❌ NO TOKEN FOUND");
+    }
 
-        const { status, data } = error.response;
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-        if (status >= 500) {
-          toast.error("An unknown server error occurred");
-        } else if (status === 404) {
-          toast.error("Resource not found");
-        } else if (status === 401 || status === 403) {
-          toast.error("Unauthorized access, please login again");
-          sessionStorage.clear();
-        } else {
-          toast.error(data?.responseMessage || "An error occurred");
-        }
+/**
+ * ✅ RESPONSE INTERCEPTOR
+ */
+axios.interceptors.response.use(
+  (response: AxiosResponse<ApiResponse>) => response,
+  (error: AxiosError<ApiResponse>) => {
+    if (!error.response) {
+      toast.error("Connection error");
+      return Promise.reject(error);
+    }
 
-        throw error;
-      }
-    );
+    const { status, data } = error.response;
 
-    return axiosInstance;
-  }, []);
+    if (status >= 500) {
+      toast.error("Server error");
+    } else if (status === 404) {
+      toast.error("Resource not found");
+    } else if (status === 401 || status === 403) {
+      toast.error("Unauthorized. Please login.");
+      // ❌ DO NOT delete token here
+    } else {
+      toast.error(data?.responseMessage || "An error occurred");
+    }
 
-  return { axios, loading };
-};
+    return Promise.reject(error);
+  }
+);
 
+export default axios;
 
-
-// import { useState, useMemo } from "react";
-// import { toast } from "react-hot-toast";
-// import Axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
-// import { ApiResponse } from "./type";
-
-// // ✅ Use VITE_ prefix for Vite env vars
-// export const baseURL =
-//   import.meta.env.VITE_BASE_URL || "https://hok-backend-6gpg.onrender.com";
-
-// export const useAxios = () => {
-//   const [loading, setLoading] = useState<boolean>(false);
-
-//   const axios = useMemo<AxiosInstance>(() => {
-//     const axiosInstance = Axios.create({
-//       baseURL,
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       withCredentials: true,
-//     });
-
-//     // ✅ Request interceptor
-//     axiosInstance.interceptors.request.use(
-//       async (config) => {
-//         setLoading(true);
-        
-//         const token = localStorage.getItem("token");
-//         console.log("Token", token)
-//         if (token) {
-//           config.headers.Authorization = `Bearer ${token}`;
-//         }
-//         return config;
-//       },
-//       (error) => {
-//         setLoading(false);
-//         return Promise.reject(error);
-//       }
-//     );
-
-//     // ✅ Response interceptor
-//     axiosInstance.interceptors.response.use(
-//       (response: AxiosResponse<ApiResponse>): AxiosResponse<ApiResponse> => {
-//         setLoading(false);
-//         return response;
-//       },
-//       async (error: AxiosError<ApiResponse>) => {
-//         setLoading(false);
-
-//         if (!error.response) {
-//           toast.error("Connection error");
-//           throw error;
-//         }
-
-//         const { status, data } = error.response;
-
-//         if (status >= 500) {
-//           toast.error("An unknown server error occurred");
-//         } else if (status === 404) {
-//           toast.error("Resource not found");
-//         } else if (status === 401 || status === 403) {
-//           toast.error("Unauthorized access, please login again");
-//           localStorage.removeItem("token"); // ✅ safer than clearing all sessionStorage
-//         } else {
-//           toast.error(data?.responseMessage || "An error occurred");
-//         }
-
-//         throw error;
-//       }
-//     );
-
-//     return axiosInstance;
-//   }, []);
-
-//   return { axios, loading };
-// };

@@ -27,7 +27,9 @@ import {
 } from "@/components/ui/pagination";
 import { Search, Plus, Edit, Trash2, Menu, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useAxios } from "@/hooks/api/axios"; // ✅ useAxios hook
+import axios from "@/hooks/api/axios";
+
+// import { useAxios } from "@/hooks/api/axios"; // ✅ useAxios hook
 
 // Interfaces
 interface Product {
@@ -52,7 +54,7 @@ interface Product {
 }
 
 const Products = () => {
-  const { axios, loading: axiosLoading } = useAxios(); // ✅ get axios + global loading
+  // const { axios, loading: axiosLoading } = useAxios(); // ✅ get axios + global loading
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
@@ -375,7 +377,7 @@ const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     return { text: "In Stock", color: "bg-green-100 text-green-800" };
   };
 
-  // Load products
+  // For the categories section
   useEffect(() => {
     const fetchCategories = async () => {
     try {
@@ -387,6 +389,7 @@ const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     } catch (err) {
       console.error("Error fetching categories:", err);
     }
+
   };
 
   fetchCategories();
@@ -436,36 +439,6 @@ const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const CLOUD_NAME = "dwfec1ne";
     const UPLOAD_PRESET = "hok-files";
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      try {
-        setLoading(true);
-        const form = new FormData();
-        form.append("file", file);
-        form.append("upload_preset", UPLOAD_PRESET);
-
-        const res = await axios.post(
-          "https://api.cloudinary.com/v1_1/dwfec1ne/image/upload",
-          { method: "POST", body: form }
-        );
-
-        console.log(res)
-
-        if (res.data.secure_url) {
-        setFormData(prev => ({ ...prev, productImage: res.data.secure_url }));
-      } else {
-        setError("Image upload failed");
-        console.error("Cloudinary error:", res.data);
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Network error while uploading image");
-    } finally {
-      setLoading(false);
-    }
-  };
 
     return (
     <div className="min-h-screen bg-gray-50">
@@ -616,7 +589,8 @@ const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
                         />
                         <button
                           type="button"
-                          onClick={() => { setPreviewImage(""); setFormData(prev => ({ ...prev, productImageFile: null })); }}
+                          onClick={() => { setPreviewImage(""); setFormData(prev => ({ ...prev, productImageFile: null
+                          })); }}
                           className="absolute top-1 right-1 bg-white rounded-full shadow p-1"
                         >
                           ✕
@@ -799,32 +773,40 @@ const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
             <DialogTitle>Product Details</DialogTitle>
             <DialogDescription>Detailed view of the product.</DialogDescription>
           </DialogHeader>
+          
+          {viewingProduct && (() => {
+  // ✅ Find the category object that matches the product
+  const productCategory = categories.find(
+    (cat) => cat._id === viewingProduct.productCategoryId
+  );
 
-          {viewingProduct && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left - Image */}
-              <div>
-                <img
-                  src={viewingProduct.productImage}
-                  alt={viewingProduct.productName}
-                  className="w-full h-auto rounded-lg"
-                />
-              </div>
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Left - Image */}
+      <div>
+        <img
+          src={viewingProduct.productImage}
+          alt={viewingProduct.productName}
+          className="w-full h-auto rounded-lg"
+        />
+      </div>
 
-              {/* Right - Details */}
-              <div>
-                <h2 className="text-2xl font-bold mb-2">{viewingProduct.productName}</h2>
-                <div className="space-y-2">
-                  <p><span className="font-semibold">Category ID:</span> {viewingProduct.productCategoryId}</p>
-                  <p><span className="font-semibold">Gender:</span> {viewingProduct.productGenderType}</p>
-                  <p><span className="font-semibold">Price:</span> ${viewingProduct.productPrice}</p>
-                  <p><span className="font-semibold">Current Size:</span> {viewingProduct.productSize}</p>
-                  <p><span className="font-semibold">Color:</span> {viewingProduct.productColor}</p>
-                  <p><span className="font-semibold">Quantity:</span> {viewingProduct.productQuantity}</p>
-                  {/* <p><span className="font-semibold">Product Volume:</span> {viewingProduct.productVolume}</p> */}
-                 
-                </div>
-                  <div className="mt-2">
+      {/* Right - Details */}
+      <div>
+        <h2 className="text-2xl font-bold mb-2">{viewingProduct.productName}</h2>
+        <div className="space-y-2">
+          <p>
+            <span className="font-semibold">Category:</span>{" "}
+            {productCategory?.categoryName || "Unknown"}
+          </p>
+          <p><span className="font-semibold">Gender:</span> {viewingProduct.productGenderType}</p>
+          <p><span className="font-semibold">Price:</span> ${viewingProduct.productPrice}</p>
+          <p><span className="font-semibold">Current Size:</span> {viewingProduct.productSize}</p>
+          <p><span className="font-semibold">Color:</span> {viewingProduct.productColor}</p>
+          <p><span className="font-semibold">Quantity:</span> {viewingProduct.productQuantity}</p>
+        </div>
+
+        <div className="mt-2">
                       <span>
                   <h3 className="font-semibold">Available Colors</h3>
                 
@@ -846,9 +828,12 @@ const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
                    {viewingProduct.createdAt && (
                     <p><span className="font-semibold">Created:</span> {new Date(viewingProduct.createdAt).toLocaleDateString()}</p>
                   )}
-                  </div>
-                </div>
-                      )}
+
+        {/* ...rest of your details */}
+      </div>
+    </div>
+  );
+})()}
                     </DialogContent>
                   </Dialog>
                 </div>
@@ -856,5 +841,3 @@ const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 };
 
 export default Products;
-
-

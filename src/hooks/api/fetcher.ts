@@ -4,7 +4,9 @@ import { useEffect } from "react";
 import { AxiosError } from "axios";
 import useSWR, { SWRResponse } from "swr";
 import { ApiResponse } from "./type";
-import { useAxios } from "./axios";
+import axios from "@/hooks/api/axios";
+
+// import { useAxios } from "./axios";
 import { toast } from "react-hot-toast";
 
 export const useFetcher = (
@@ -12,7 +14,7 @@ export const useFetcher = (
   params?: Record<string, any>,
   hideToast?: boolean
 ): SWRResponse<ApiResponse, AxiosError> => {
-  const { axios } = useAxios();
+  // const { axios } = useAxios();
 
   const fetcher = async (url: string) => {
     const res = await axios.get<ApiResponse>(url, { params });

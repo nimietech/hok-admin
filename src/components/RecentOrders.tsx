@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { useAxios } from "@/hooks/api/axios";
+import axios from "@/hooks/api/axios";
+
+// import { useAxios } from "@/hooks/api/axios";
 
 // ---------- Types ----------
 interface Product {
@@ -31,6 +33,7 @@ export interface OrderData {
   deliveryLocation: string;
   deliveryStatus: string;
   owner: string;
+  customerEmail:string;
   cart: CartItem[];
   createdAt: string;
   updatedAt: string;
@@ -64,7 +67,7 @@ const getStatusColor = (status: string) => {
 
 // ---------- Component ----------
 export const RecentOrders = () => {
-  const { axios } = useAxios();
+  // const { axios } = useAxios();
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +79,7 @@ export const RecentOrders = () => {
           "/orders/admin-fetch-orders?page=1&limit=25"
         );
 
+        console.log(res)
         // Defensive checks
         if (!res.data.success || !res.data.data?.results) {
           throw new Error(res.data.message || "Failed to fetch orders");
@@ -118,8 +122,8 @@ export const RecentOrders = () => {
           <div key={order._id} className="border rounded-lg p-4 hover:bg-gray-50">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-900">Order ID: {order._id}</p>
-                <p className="text-sm text-gray-600">Owner: {order.owner}</p>
+                <p className="font-medium text-gray-900">Customer: {order.customerEmail}</p>
+                {/* <p className="text-sm text-gray-600">Owner: {order.owner}</p> */}
                 <p className="text-sm text-gray-600">
                   Delivery: {order.deliveryLocation}
                 </p>
@@ -137,9 +141,11 @@ export const RecentOrders = () => {
 
             {/* Products inside each order */}
             <div className="mt-3 space-y-1">
+              <p className="font-medium text-gray-900">Orders:</p>
               {order.cart.map((item, idx) => (
                 item.product
                   ? (
+                      
                       <div key={item.product._id || idx} className="flex justify-between text-sm">
                         <span>{item.product.productName} (x{item.quantity})</span>
                         <span>${item.product.productPrice}</span>

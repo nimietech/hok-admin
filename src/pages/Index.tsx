@@ -19,10 +19,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useFetcher } from "@/hooks/api/fetcher";
-import { useAxios } from "@/hooks/api/axios"; // use your axios hook
+import axios from "@/hooks/api/axios";
+
+// import { useAxios } from "@/hooks/api/axios"; // use your axios hook
 
 const Index = () => {
-  const { axios } = useAxios();
+  // const { axios } = useAxios();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [totalOrders, setTotalOrders] = useState(0);
@@ -150,7 +152,7 @@ const Index = () => {
         setStatsError(`Authorization error (403): ${serverMsg}`);
         console.warn("403 from stats endpoints:", err.response?.data);
       } else {
-        setStatsError("Failed to fetch stats. Check console/network for details.");
+        setStatsError("Failed to fetch stats.");
       }
     }
   };
