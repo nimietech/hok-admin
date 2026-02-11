@@ -53,6 +53,22 @@ interface Product {
   discountPercentage?: string | null;
 }
 
+const ColorBadge = ({ color }: { color: string }) => {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className="w-4 h-4 rounded-full border"
+        style={{ backgroundColor: color }}
+        title={color}
+      />
+      <span className="text-sm text-gray-700 capitalize">
+        {color}
+      </span>
+    </div>
+  );
+};
+
+
 const Products = () => {
   // const { axios, loading: axiosLoading } = useAxios(); // ✅ get axios + global loading
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -802,22 +818,25 @@ const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
           <p><span className="font-semibold">Gender:</span> {viewingProduct.productGenderType}</p>
           <p><span className="font-semibold">Price:</span> ${viewingProduct.productPrice}</p>
           <p><span className="font-semibold">Current Size:</span> {viewingProduct.productSize}</p>
-          <p><span className="font-semibold">Color:</span> {viewingProduct.productColor}</p>
+         
+
+          <p className="font-semibold flex items-center gap-1">Color: <ColorBadge color={viewingProduct.productColor}/> </p>
           <p><span className="font-semibold">Quantity:</span> {viewingProduct.productQuantity}</p>
         </div>
 
         <div className="mt-2">
-                      <span>
-                  <h3 className="font-semibold">Available Colors</h3>
-                
-                  <ul className="flex gap-2">
+                  <span>
+                  <h3 className="font-semibold">Available Colors:</h3>
+                  <ul className="flex gap-4 flex-wrap mt-1">
                     {viewingProduct.availableColors.map((color) => (
-                      <li key={color}>{color}</li>
+                      <li key={color}>
+                        <ColorBadge color={color} />
+                      </li>
                     ))}
                   </ul>
                   </span>
 
-                  <h3 className="font-semibold mt-2">Available Sizes</h3>
+                  <h3 className="font-semibold mt-2">Available Sizes:</h3>
                   <ul className="flex gap-2">
                     {viewingProduct.availableSizes.map((size) => (
                       <li key={size}>{size}</li>
